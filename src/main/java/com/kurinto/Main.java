@@ -31,6 +31,7 @@ public class Main {
 
     ){}
 
+//    Same AS RECORD CLASS
 //    class Greet{
 //        private final String greet;
 //
