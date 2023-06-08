@@ -1,5 +1,6 @@
 package com.kurinto.customer;
 
+import com.kurinto.exception.ResourceNotFound;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +20,9 @@ public class CustomerService {
     }
 
     public Customer getCustomerById(Integer customerId){
-        return customerDao.selectCustomerById(customerId).orElseThrow(() -> new IllegalArgumentException(
-                "No customer id with id [%s]".formatted(customerId)
-        ));
+        return customerDao.selectCustomerById(customerId)
+                .orElseThrow(() -> new ResourceNotFound(
+                    "No customer id with id [%s]".formatted(customerId)
+            ));
     }
 }
