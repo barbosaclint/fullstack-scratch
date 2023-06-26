@@ -1,12 +1,11 @@
 package com.kurinto.customer;
 
-import com.kurinto.exception.ResourceNotFound;
+import com.kurinto.exception.DuplicateResourceException;
+import com.kurinto.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class  CustomerService {
@@ -22,8 +21,37 @@ public class  CustomerService {
 
     public Customer getCustomerById(Integer customerId){
         return customerDao.selectCustomerById(customerId)
-                .orElseThrow(() -> new ResourceNotFound(
+                .orElseThrow(() -> new ResourceNotFoundException(
                     "No customer id with id [%s]".formatted(customerId)
             ));
+    }
+
+    public void addCustomer(CustomerRegistrationRequest customerRegistrationRequest){
+
+        String email = customerRegistrationRequest.email();
+
+        if (customerDao.existsPersonWithEmail(email)){
+            throw new DuplicateResourceException(
+                    "email already exist"
+            );
+        }
+
+        Customer customer = new Customer(
+                customerRegistrationRequest.name(),
+                customerRegistrationRequest.email(),
+                customerRegistrationRequest.age()
+        );
+
+        customerDao.insertCustomer(customer);
+    }
+
+    public void deleteCustomer(Integer customerId){
+        if (!customerDao.existsCustomersById(customerId)){
+            throw new ResourceNotFoundException(
+                    "No customer found with id [%n] ".formatted(customerId)
+            );
+        }
+
+        customerDao.deleteCustomer(customerId);
     }
 }
