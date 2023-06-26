@@ -1,6 +1,7 @@
 package com.kurinto.customer;
 
 import com.kurinto.exception.DuplicateResourceException;
+import com.kurinto.exception.RequestValidationException;
 import com.kurinto.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -53,5 +54,39 @@ public class  CustomerService {
         }
 
         customerDao.deleteCustomer(customerId);
+    }
+
+    public void updateCustomer(Integer customerId, CustomerUpdateRequest customerUpdateRequest){
+
+        Customer customer = getCustomerById(customerId);
+        boolean gotChanges = false;
+
+        if (customerUpdateRequest.name() != null && !customerUpdateRequest.name().equals(customer.getName())) {
+            customer.setName(customerUpdateRequest.name());
+            gotChanges = true;
+        }
+
+        if (customerUpdateRequest.age() != null && !customerUpdateRequest.age().equals(customer.getAge())) {
+            customer.setAge(customerUpdateRequest.age());
+            gotChanges = true;
+        }
+
+        if (customerUpdateRequest.email() != null && !customerUpdateRequest.email().equals(customer.getEmail())) {
+            if (customerDao.existsPersonWithEmail(customerUpdateRequest.email())){
+                throw new DuplicateResourceException(
+                        "email already exist"
+                );
+            }
+            customer.setEmail(customerUpdateRequest.email());
+            gotChanges = true;
+        }
+
+        if (!gotChanges) {
+            throw new RequestValidationException(
+                    "No changes found"
+            );
+        }
+
+        customerDao.updateCustomer(customer);
     }
 }
