@@ -25,24 +25,21 @@ public class CustomerJDBCDataAccessService implements CustomerDao{
                 SELECT id, name, email, age 
                     FROM customer
                 """;
-        RowMapper<Customer> customerRowMapper = (rs, rowNum) -> {
-            Customer customer = new Customer(
-                    rs.getInt("id"),
-                    rs.getString("name"),
-                    rs.getString("email"),
-                    rs.getInt("age")
-            );
-            return customer;
-        };
 
-        List<Customer> customers = jdbcTemplate.query(sql, customerRowMapper);
-
-        return customers;
+        return jdbcTemplate.query(sql, customerRowMapper);
     }
 
     @Override
     public Optional<Customer> selectCustomerById(Integer customerId) {
-        return Optional.empty();
+
+        String sql = """
+                SELECT id, name, email, age
+                    FROM customer WHERE id = ?
+                """;
+
+        return jdbcTemplate.query(sql, customerRowMapper, customerId)
+                .stream()
+                .findFirst();
     }
 
     @Override
@@ -60,17 +57,36 @@ public class CustomerJDBCDataAccessService implements CustomerDao{
 
     @Override
     public boolean existsPersonWithEmail(String email) {
-        return false;
+        String sql = """
+                SELECT COUNT(id) FROM customer
+                    WHERE email = ?
+                """;
+
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
+
+        return count != null && count > 0;
     }
 
     @Override
     public boolean existsCustomersById(Integer customerId) {
-        return false;
+
+        String sql = """
+                SELECT COUNT(id) FROM customer
+                where id = ?
+                """;
+
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, customerId);
+
+        return count != null && count > 0;
     }
 
     @Override
     public void deleteCustomer(Integer customerId) {
-
+        String sql = """
+                DELETE FROM customer
+                WHERE id = ?
+                """;
+        int result = jdbcTemplate.update(sql, customerId);
     }
 
     @Override
