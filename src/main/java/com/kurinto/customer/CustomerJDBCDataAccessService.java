@@ -92,5 +92,31 @@ public class CustomerJDBCDataAccessService implements CustomerDao{
     @Override
     public void updateCustomer(Customer customer) {
 
+        if (customer.getName() != null){
+            String sql = "UPDATE customer SET name = ? WHERE id = ?";
+            int result = jdbcTemplate.update(
+                    sql,
+                    customer.getName(),
+                    customer.getId()
+            );
+        }
+
+        if (customer.getAge() != null){
+            String sql = "UPDATE customer SET age = ? WHERE id = ?";
+            int result = jdbcTemplate.update(
+                    sql,
+                    customer.getAge(),
+                    customer.getId()
+            );
+        }
+
+        if (customer.getEmail() != null){
+            String sql = "UPDATE customer SET email = ? WHERE id = ?";
+            int result = jdbcTemplate.update(
+                    sql,
+                    customer.getEmail(),
+                    customer.getId()
+            );
+        }
     }
 }
