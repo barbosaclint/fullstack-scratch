@@ -18,6 +18,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Testcontainers
 public class BaseTestContainersUnitTest {
 
+    @Container
+    protected static final PostgreSQLContainer<?> postgreSQLContainer =
+            new PostgreSQLContainer<>("postgres:latest")
+                    .withDatabaseName("amigoscode-dao-unit-test")
+                    .withUsername("amigoscode")
+                    .withPassword("password");
+
     @BeforeAll
     static void beforeAll() {
         Flyway flyway = Flyway.configure().dataSource(
@@ -29,12 +36,6 @@ public class BaseTestContainersUnitTest {
         System.out.println();
     }
 
-    @Container
-    protected static final PostgreSQLContainer<?> postgreSQLContainer =
-            new PostgreSQLContainer<>("postgres:latest")
-                    .withDatabaseName("amigoscode-dao-unit-test")
-                    .withUsername("amigoscode")
-                    .withPassword("password");
     @DynamicPropertySource
     private static void registerDataSourceProperties(DynamicPropertyRegistry registry){
 
